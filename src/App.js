@@ -1,26 +1,53 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+import Home from './components/Home'
+import Navbar from './components/Navbar'
+
 class App extends Component {
+  state = {
+      sessionToken: undefined,
+      user: null
+  }
+
+  componentDidMount() {
+    const token = localStorage.getItem('token');
+        if (token && this.state.user === null) {
+            localStorage.removeItem('token');
+        } else {
+            if (token && this.state.sessionToken === undefined) {
+                this.setState({
+                    sessionToken: token
+                });
+            }
+        }
+  }
+
+  storeAuthData = (user, token) => {
+    this.setState({
+      user: user,
+      sessionToken: token
+    })
+  }
+
+  clearAuthData = () => {
+    this.setState({
+      user: null,
+      sessionToken: undefined
+    })
+    localStorage.clear()
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <React.Fragment>
+        <Navbar 
+        storeAuthData={this.storeAuthData} 
+        clearAuthData={this.clearAuthData}
+        user={this.state.user}
+        token={this.state.sessionToken} />
+        <Home />
+      </React.Fragment>
     );
   }
 }
